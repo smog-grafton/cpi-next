@@ -1,0 +1,9 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { getAdminSession, hasRole } from "@/server/auth";
+import { archiveContentEntry, updateContentEntry } from "@/server/services/content-admin";
+import { contentEntryInputSchema, validateContentPayload } from "@/server/validation/admin-content";
+import { validationError } from "@/server/http/responses";
+
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) { const session = await getAdminSession(); if (!session?.user || !hasRole(session, "CONTENT_EDITOR")) return NextResponse.json({ ok: false, message: "Forbidden." }, { status: 403 }); const parsed = contentEntryInputSchema.safeParse(await request.json().catch(() => null)); if (!parsed.success) return validationError(parsed.error); if (["SITE_SETTINGS", "GIVING_PURPOSE", "CAMPAIGN"].includes(parsed.data.kind) && !hasRole(session, "MINISTRY_ADMIN")) return NextResponse.json({ ok: false, message: "A ministry administrator must manage this content type." }, { status: 403 }); const payload = validateContentPayload(parsed.data.kind, parsed.data.payload); if (!payload.success) return validationError(payload.error); const updated = await updateContentEntry((await params).id, { ...parsed.data, payload: payload.data }); return NextResponse.json({ ok: updated }, { status: updated ? 200 : 404 }); }
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) { const session = await getAdminSession(); if (!session?.user || !hasRole(session, "CONTENT_EDITOR")) return NextResponse.json({ ok: false, message: "Forbidden." }, { status: 403 }); const archived = await archiveContentEntry((await params).id); return NextResponse.json({ ok: archived, status: "ARCHIVED" }, { status: archived ? 200 : 404 }); }

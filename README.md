@@ -46,7 +46,7 @@ npm.cmd run test:e2e
 - Giving stops before transfer confirmation until approved instructions are supplied.
 - The client profile supplies Pastor Stephen Kabuye, the 2014 Johannesburg origin and Sunday Kingdom Citizens Celebration from 9:00am–12:00pm. The exact venue, weekday times, contacts, social links and production media still require approval or configuration.
 - Donation evidence is private and stored under `storage/private/donation-evidence`; this directory must never be served by the web server.
-- Generated logo, favicon, radio artwork and temporary commissioned imagery are under `public/assets/img/brand/cpmi/` and can be replaced or refined by the ministry.
+- Editable SVG artwork is in [the CPMI wordmark](public/assets/img/brand/cpmi/cpmi-wordmark.svg) and [the header mark and favicon](public/assets/img/brand/cpmi/cpmi-mark.svg). The same folder contains the PNG alternatives, station artwork and temporary photography.
 
 See [Implementation status](docs/IMPLEMENTATION_STATUS.md), [Deployment](docs/DEPLOYMENT.md), and [Danbox source mapping](docs/DANBOX_SOURCE_MAPPING.md) for the complete handoff.
 

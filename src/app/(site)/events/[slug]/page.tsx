@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import PageBanner from "@/components/PageBanner";
+import EventRegistrationForm from "@/components/forms/EventRegistrationForm";
+import { getEvent, getPublicContent } from "@/server/repositories/content-repository";
+
+export async function generateStaticParams() { return (await getPublicContent()).events.map(({ slug }) => ({ slug })); }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const event = await getEvent((await params).slug); return event ? { title: event.title, description: event.summary } : { title: "Event" }; }
+export default async function EventDetailPage({ params }: { params: Promise<{ slug: string }> }) { const event = await getEvent((await params).slug); if (!event) notFound(); const start = new Date(event.startsAt); return <><PageBanner pageName={event.title} breadcrumbs={[{ label: "Home", href: "/" }, { label: "Events", href: "/events" }, { label: event.title }]} /><section className="event-details-wrap section-padding"><div className="container"><div className="row g-5"><article className="col-lg-8"><Image src={event.image.src} alt={event.image.alt} width={1100} height={720} priority /><div className="detail-copy"><span className="content-label">{new Intl.DateTimeFormat("en", { dateStyle: "long", timeStyle: "short", timeZone: event.timezone }).format(start)}</span><h2>{event.title}</h2><p className="lead">{event.summary}</p>{event.description.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></article><aside className="col-lg-4"><div className="detail-sidebar"><h3>Event details</h3><dl>{event.venueName && <><dt>Venue</dt><dd>{event.venueName}</dd></>}{event.venueAddress && <><dt>Address</dt><dd>{event.venueAddress}</dd></>}<dt>Timezone</dt><dd>{event.timezone}</dd></dl><a className="theme-btn transparent-btn-2" href={`/events/${event.slug}/calendar`}>Add to calendar</a></div>{event.registrationEnabled && <EventRegistrationForm eventSlug={event.slug} />}</aside></div></div></section></>; }

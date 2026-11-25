@@ -1,0 +1,9 @@
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { getAdminSession, hasRole } from "@/server/auth";
+import { createContentEntry, listContentEntries } from "@/server/services/content-admin";
+import { contentEntryInputSchema, validateContentPayload } from "@/server/validation/admin-content";
+import { validationError } from "@/server/http/responses";
+
+export async function GET() { const session = await getAdminSession(); if (!session?.user || !hasRole(session, "CONTENT_EDITOR")) return NextResponse.json({ ok: false, message: "Forbidden." }, { status: 403 }); return NextResponse.json({ ok: true, entries: await listContentEntries() }); }
+export async function POST(request: NextRequest) { const session = await getAdminSession(); if (!session?.user || !hasRole(session, "CONTENT_EDITOR")) return NextResponse.json({ ok: false, message: "Forbidden." }, { status: 403 }); const parsed = contentEntryInputSchema.safeParse(await request.json().catch(() => null)); if (!parsed.success) return validationError(parsed.error); if (["SITE_SETTINGS", "GIVING_PURPOSE", "CAMPAIGN"].includes(parsed.data.kind) && !hasRole(session, "MINISTRY_ADMIN")) return NextResponse.json({ ok: false, message: "A ministry administrator must manage this content type." }, { status: 403 }); const payload = validateContentPayload(parsed.data.kind, parsed.data.payload); if (!payload.success) return validationError(payload.error); try { const id = await createContentEntry({ ...parsed.data, payload: payload.data }, session.user.id); return NextResponse.json({ ok: true, id }, { status: 201 }); } catch (error) { const message = error instanceof Error && error.message === "PERSISTENCE_UNAVAILABLE" ? "Database persistence is unavailable." : "The content entry could not be created. Check for a duplicate kind and slug."; return NextResponse.json({ ok: false, message }, { status: 503 }); } }

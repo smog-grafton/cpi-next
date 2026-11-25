@@ -1,0 +1,16 @@
+node_modules/
+tmp/
+.DS_Store
+.next/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.local
+.env.*.local
+!.env.example
+npm-debug.log*
+*.tsbuildinfo
+public/uploads/*
+!public/uploads/.gitkeep
+storage/private/

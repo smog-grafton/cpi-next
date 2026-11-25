@@ -1,0 +1,8 @@
+import type { Metadata } from "next";
+import PageBanner from "@/components/PageBanner";
+import ContactForm from "@/components/forms/ContactForm";
+import SectionHeading from "@/components/site/SectionHeading";
+import { getPublicContent } from "@/server/repositories/content-repository";
+
+export const metadata: Metadata = { title: "Contact", alternates: { canonical: "/contact" } };
+export default async function ContactPage() { const { settings } = await getPublicContent(); return <><PageBanner pageName="Contact" pageTitle="Start a conversation with CPMI" /><section className="contact-page-wrap section-padding"><div className="container"><div className="row g-5"><div className="col-lg-5"><SectionHeading eyebrow="Contact CPMI" title="Ask a question or request a response" align="start" /><p>Use this form for general enquiries. Prayer requests have a separate private pathway.</p><div className="contact-information-list">{settings.publicEmail && <a href={`mailto:${settings.publicEmail}`}><i className="fal fa-envelope" /><span><small>Email</small>{settings.publicEmail}</span></a>}{settings.publicPhone && <a href={`tel:${settings.publicPhone}`}><i className="fal fa-phone" /><span><small>Phone</small>{settings.publicPhone}</span></a>}{settings.address && <div><i className="fal fa-map-marker-alt" /><span><small>Location</small>{settings.address}</span></div>}<a className="prayer-contact-link" href="/prayer"><i className="fal fa-hands-praying" /><span><small>Private pastoral care</small>Send a prayer request</span></a></div></div><div className="col-lg-7"><ContactForm /></div></div></div></section></>; }

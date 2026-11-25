@@ -1,0 +1,6 @@
+import Link from "next/link";
+import type { Session } from "next-auth";
+import { hasRole } from "@/server/auth";
+import AdminLogoutButton from "./AdminLogoutButton";
+
+export default function AdminSidebar({ session }: { session: Session }) { const links = [{ href: "/admin", label: "Dashboard", icon: "far fa-grid-2" }, ...(hasRole(session, "CONTENT_EDITOR") ? [{ href: "/admin/content", label: "Content", icon: "far fa-pen-to-square" }] : []), ...(hasRole(session, "MINISTRY_ADMIN") ? [{ href: "/admin/submissions", label: "Submissions", icon: "far fa-inbox" }] : []), ...(hasRole(session, "FINANCE_REVIEWER") ? [{ href: "/admin/donations", label: "Donations", icon: "far fa-hand-holding-dollar" }] : [])]; return <aside className="admin-sidebar"><Link href="/admin" className="cpmi-wordmark is-inverse"><span className="cpmi-monogram">CPMI</span><span className="cpmi-wordmark-copy">Ministry<br />Administration</span></Link><nav aria-label="Administration">{links.map((link) => <Link href={link.href} key={link.href}><i className={link.icon} />{link.label}</Link>)}</nav><div className="admin-user"><span>{session.user.name || session.user.email}</span><small>{session.user.role.replaceAll("_", " ")}</small><AdminLogoutButton /></div></aside>; }

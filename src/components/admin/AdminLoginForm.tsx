@@ -1,0 +1,7 @@
+"use client";
+
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, type FormEvent } from "react";
+
+export default function AdminLoginForm() { const router = useRouter(); const search = useSearchParams(); const [error, setError] = useState<string | null>(null); const [submitting, setSubmitting] = useState(false); async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setSubmitting(true); setError(null); const data = new FormData(event.currentTarget); const result = await signIn("credentials", { email: data.get("email"), password: data.get("password"), redirect: false }); setSubmitting(false); if (result?.ok) { router.push(search.get("callbackUrl") || "/admin"); router.refresh(); } else setError("The email or password is not valid, or database authentication is unavailable."); } return <form className="admin-login-form" onSubmit={submit}><label htmlFor="admin-email">Email</label><input id="admin-email" name="email" type="email" required autoComplete="username" /><label htmlFor="admin-password">Password</label><input id="admin-password" name="password" type="password" required minLength={8} autoComplete="current-password" />{error && <div className="admin-alert" role="alert">{error}</div>}<button className="theme-btn" type="submit" disabled={submitting}>{submitting ? "Signing in…" : "Sign in securely"}</button></form>; }

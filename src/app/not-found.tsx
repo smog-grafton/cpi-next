@@ -1,0 +1,3 @@
+import Link from "next/link";
+
+export default function NotFound() { return <main id="main-content" className="not-found-page"><div className="not-found-art"><span>404</span><i className="far fa-compass" /></div><div><span className="content-label">Page not found</span><h1>This path does not lead anywhere yet.</h1><p>The page may have moved, the address may be mistyped, or the content may not be published.</p><div className="not-found-actions"><Link href="/" className="theme-btn">Return home</Link><Link href="/search" className="theme-btn transparent-btn-2">Search CPMI</Link></div></div></main>; }
